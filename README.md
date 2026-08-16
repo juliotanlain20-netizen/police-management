@@ -56,3 +56,5 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# police-management
+A web-based Police Management System for managing citizen complaints, investigations, evidence, officers, and role-based access control.
