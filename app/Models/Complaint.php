@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 #[Fillable([
     'user_id',
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 ])]
 class Complaint extends Model
 {//kalau satu aja pake singular
+use HasFactory;
     public function user(){
         return $this->belongsTo(User::class,'user_id','id');
     }

@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Model;
     'description',
     'status',
     'priority',
+    'opened_at',
+'closed_at',
 ])]
 class InvestigationCase extends Model
 {
@@ -23,6 +25,9 @@ class InvestigationCase extends Model
     }
     public function evidences(){
         return $this->hasMany(Evidence::class,'investigation_case_id','id');
+    }
+    public function suspects(){
+        return $this->hasMany(Suspect::class,'investigation_case_id','id');
     }
     public function officers(){
         return $this->belongsToMany(PoliceOfficer::class,'case_officers','investigation_case_id', 'police_officer_id' );
