@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\InvestigationRequest;
-use App\Http\Requests\storeInvestigationRequest;
+use App\Http\Requests\StoreInvestigationRequest;
 use App\Models\Complaint;
 use App\Models\InvestigationCase;
 use Illuminate\Http\Request;
@@ -33,7 +33,7 @@ class InvestigationCaseController extends Controller
         //'complaint.attachments' melalui complaint, ambil complaintattachment karna kan tersambung dengan complaint
         // itu with('berdasarkan nama method di belongsto di model')
     }
-    public function store(storeInvestigationRequest $request, $id)
+    public function store(StoreInvestigationRequest $request, $id)
     {
         $complaint = Complaint::findOrFail($id);
         if($complaint->investigationCase()->exists()){

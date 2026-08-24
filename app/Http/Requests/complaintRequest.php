@@ -23,19 +23,25 @@ class complaintRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category_id'=>'required|exists:complaint_categories,id',
-            'title'=>'required',
-            'description'=>'required',
-            'location'=>'required',
-            'incident_date'=>'required',
+            'attachments' => 'nullable|array',
+            'attachments.*' => 'file|max:10240',
+            'action' => 'required|in:save,submit',
+            'category_id' => 'nullable|required_if:action,submit|exists:complaint_categories,id',
+            'title' => 'nullable|required_if:action,submit|string|max:255',
+            'description' => 'nullable|required_if:action,submit|string',
+            'incident_date' => 'nullable|required_if:action,submit|date',
+            'location' => 'nullable|required_if:action,submit|string',
         ];
     }
-    public function messages():array{
-        return[
-        'category.required'=>'category yang sesuai',
-        'title.required'=>'judulnya di isi dong',
-        'description.required'=>'isi rinciannya di sini',
-        'location.required'=>'location harus di isi',
-        'incident_date.required'=>'tanggal harus di isi',
-    ];}
+    public function messages(): array
+    {
+        return [
+            'attachments.*.max' => 'Setiap attachment maksimal 10 MB.',
+            'category.required' => 'category yang sesuai',
+            'title.required' => 'judulnya di isi dong',
+            'description.required' => 'isi rinciannya di sini',
+            'location.required' => 'location harus di isi',
+            'incident_date.required' => 'tanggal harus di isi',
+        ];
+    }
 }
