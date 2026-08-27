@@ -25,23 +25,25 @@ Route::middleware('auth')->group(function () {
     Route::patch('/complaints/{id}/request-more-evidence', [ComplaintController::class, 'requestMoreEvidence'])->name('complaints.requestMoreEvidence');
     Route::patch('/complaints/{id}/reject', [ComplaintController::class, 'reject'])->name('complaints.reject');
     //ATTACHMENT
-    Route::get('/attachment',[ComplaintAttachmentController::class,'index']);
-    });
-    Route::get('/test-login', function (Request $request) {
-        Auth::loginUsingId(1);
-        $request->session()->regenerate();
-        return [
-            'login' => Auth::check(),
-            'user' => Auth::user(),
-        ];
-    });
+    Route::get('/attachment/{id}', [ComplaintAttachmentController::class, 'index']);
+    Route::get('/complaint/{complaintId}/attachments/{attachmentId}', [ComplaintAttachmentController::class, 'show'])->name('complaint.attachments.show');
+    Route::post('/complaint/{complaintId}/attachments', [ComplaintAttachmentController::class, 'store'])->name('complaint.attachments.store');
+    Route::get('/complaint/{complaintId}/attachments/{attachmentId}/download', [ComplaintAttachmentController::class, 'download'])->name('complaint.attachments.download');
+    Route::delete('/complaint/{complaintId}/attachments/{attachmentId}', [ComplaintAttachmentController::class, 'destroy'])->name('complaint.attachments.destroy');
+});
+Route::get('/test-login', function (Request $request) {
+    Auth::loginUsingId(1);
+    $request->session()->regenerate();
+    return [
+        'login' => Auth::check(),
+        'user' => Auth::user(),
+    ];
+});
 
 //INVESTIGATION CASES
 Route::get('/cases', [InvestigationCaseController::class, 'index']);
 Route::get('/case/{id}', [InvestigationCaseController::class, 'show']);
 Route::put('/case/{id}', [InvestigationCaseController::class, 'update']);
-Route::put('moreevidence/{id}', [ComplaintController::class, 'requestmoreEvidence']);
-Route::put('reject/{id}', [ComplaintController::class, 'reject']);
 
 Route::post('login', [AuthController::class, 'login'])->name('login.store');
 Route::get('login', [AuthController::class, 'showLoginForm'])->name('login.form');

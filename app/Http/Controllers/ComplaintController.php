@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\complaintRequest;
+use App\Http\Requests\ComplaintRequest;
 use App\Models\Complaint;
 use App\Models\ComplaintAttachment;
 use App\Models\ComplaintCategory;
-use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ComplaintController extends Controller
 {
@@ -83,10 +83,9 @@ class ComplaintController extends Controller
     {
         $categories = ComplaintCategory::all();
         return view('complaint.create', compact('categories'));
-        // return view('complaint');
     }
 
-    public function store(complaintRequest $request)
+    public function store(ComplaintRequest $request)
     {
         if ($request->action === 'submit') {
             $status = 'Pending';
@@ -173,7 +172,10 @@ class ComplaintController extends Controller
                 'message' => 'complaint sudah jadi kasus dan tidak bisa di hapus'
             ], 409);
         }
-        Complaint::destroy($id);
+        foreach ($complaint->attachments as $attachment) {
+            Storage::delete($attachment->file_path);
+        }
+        $complaint->delete();
         return redirect()->route('complaint');
     }
     public function requestMoreEvidence(Request $request, $id)

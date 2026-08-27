@@ -45,9 +45,10 @@
         <input type="text" name="location" id="location" value="{{$complaint->location}}">
         </div>
 
-        <button type="submit" value="save">save change</button>
+        <button type="submit" value="save" name="action">save change</button>
         @if (in_array($complaint->status, ['Draft', 'Need More Evidence']))
     <button type="submit" name="action" value="submit">
+
         @if ($complaint->status === 'Draft')
             Submit Complaint
         @else
@@ -56,6 +57,46 @@
     </button>
 @endif
     </form>
+    <h2>Tambah Attachment</h2>
+
+<form
+    action="{{ route('complaint.attachments.store', $complaint->id) }}"
+    method="POST"
+    enctype="multipart/form-data"
+>
+    @csrf
+
+    <input type="file" name="attachment">
+
+    <button type="submit">
+        Tambah Attachment
+    </button>
+</form>
+<h2>Attachments</h2>
+
+@forelse ($complaint->attachments as $attachment)
+    <p>
+        {{ $attachment->file_name }}
+
+        <form
+            action="{{ route('complaint.attachments.destroy', [
+                $complaint->id,
+                $attachment->id
+            ]) }}"
+            method="POST"
+            style="display: inline;"
+        >
+            @csrf
+            @method('DELETE')
+
+            <button type="submit">
+                Hapus
+            </button>
+        </form>
+    </p>
+@empty
+    <p>Tidak ada attachment.</p>
+@endforelse
     
 </body>
 </html>

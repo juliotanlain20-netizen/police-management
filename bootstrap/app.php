@@ -14,6 +14,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             // 'isAdmin'=>\App\http\Middleware\CheckMembership::class
+            // 'role'=>\App\http\Middleware\RoleMiddleware::class
+
         ]);
         //nah ini untuk yang di controller yang auth itu loh
         $middleware->redirectGuestsTo(
