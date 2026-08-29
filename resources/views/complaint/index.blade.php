@@ -8,6 +8,13 @@
 </head>
 <body>
     <h1> complaint dari index</h1>
+    <form action="{{ route('logout') }}" method="POST">
+    @csrf
+
+    <button type="submit" class="btn btn-danger">
+        Logout
+    </button>
+</form>
     @if ($complaints->isEmpty())
         <p>Belum ada complaint.</p>
     @else

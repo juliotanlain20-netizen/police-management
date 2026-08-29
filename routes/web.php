@@ -22,8 +22,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/update/{id}', [ComplaintController::class, 'update'])->name('complaint.update');
     Route::delete('/{id}', [ComplaintController::class, 'destroy']);
     Route::post('/complaint/{id}/case', [InvestigationCaseController::class, 'store']);
-    Route::patch('/complaints/{id}/request-more-evidence', [ComplaintController::class, 'requestMoreEvidence'])->name('complaints.requestMoreEvidence');
-    Route::patch('/complaints/{id}/reject', [ComplaintController::class, 'reject'])->name('complaints.reject');
+    Route::patch('/complaints/{id}/request-more-evidence', [ComplaintController::class, 'requestMoreEvidence'])->name('complaint.requestMoreEvidence');
+    Route::patch('/complaints/{id}/reject', [ComplaintController::class, 'reject'])->name('complaint.reject');
     //ATTACHMENT
     Route::get('/attachment/{id}', [ComplaintAttachmentController::class, 'index']);
     Route::get('/complaint/{complaintId}/attachments/{attachmentId}', [ComplaintAttachmentController::class, 'show'])->name('complaint.attachments.show');

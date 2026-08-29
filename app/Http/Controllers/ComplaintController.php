@@ -14,14 +14,9 @@ class ComplaintController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-
-        $isPoliceOrAdmin = $user->roles()
-            ->whereIn('roles.name', ['police', 'admin'])
-            ->exists();
-
         $query = Complaint::with('category');
 
-        if (!$isPoliceOrAdmin) {
+        if (!$user->hasPermission('complaint.view_all')) {
             // Citizen / Author hanya miliknya
             $query->where('user_id', $user->id);
         } else {
@@ -45,8 +40,7 @@ class ComplaintController extends Controller
         $complaint = Complaint::where('id', $id)
             ->with(['category', 'attachments'])->firstOrFail();
         $user = $request->user(); //sedang login
-        $isPoliceOrAdmin = $user->roles()->whereIn('name', ['police', 'admin'])
-            ->exists();
+        $canViewall= $user->hasPermission('complaint.view_all');
         // Draft selalu private
         if (
             $complaint->status === 'Draft' &&
@@ -56,7 +50,7 @@ class ComplaintController extends Controller
         }
         // Non police/admin hanya boleh melihat miliknya sendiri
         if (
-            !$isPoliceOrAdmin &&
+            !$canViewall &&
             $complaint->user_id !== $user->id
         ) {
             abort(403, 'Kamu tidak memiliki akses ke complaint ini');
@@ -182,10 +176,9 @@ class ComplaintController extends Controller
     {
         $complaint = Complaint::findOrFail($id);
         $user = $request->User();
-        $isPoliceandAdmin = $user->roles()->whereIn('roles.name', ['police', 'admin'])->exists();
-        if (!$isPoliceandAdmin) {
-            abort(403, 'hanya polisi dan admin yang boleh ubah ke status ini');
-        }
+       if(!$user->hasPermission('complaint.request_more_evidence')){
+        abort(403,'kamu tidak memiliki permission untuk meminta bukti tambahan');
+       }
         if ($complaint->investigationCase()->exists()) {
             return response()->json([
                 'message' => 'complaint sudah jadi kasus dan tidak dapat di ubah'
@@ -204,9 +197,8 @@ class ComplaintController extends Controller
     {
         $complaint = Complaint::findOrFail($id);
         $user = $request->User();
-        $isPoliceandAdmin = $user->roles()->whereIn('roles.name', ['police', 'admin'])->exists();
-        if (!$isPoliceandAdmin) {
-            abort(403, 'hanya polisi dan admin yang boleh ubah ke status ini');
+        if(!$user->hasPermission('complaint.reject')){
+            abort(403,'kamu tidak memiliki permission untuk reject');
         }
         if ($complaint->investigationCase()->exists()) {
             return response()->json([

@@ -46,6 +46,7 @@ class ComplaintAttachmentController extends Controller
         )->findOrFail($attachmentId);
 
         $user = $request->user();
+        if(!$user::hasPermission(''))
         $isPoliceOrAdmin = $user->roles()
             ->whereIn('roles.name', ['police', 'admin'])
             ->exists();
@@ -72,7 +73,7 @@ class ComplaintAttachmentController extends Controller
         $complaint = Complaint::findOrFail($complaintId);
         $attachment = ComplaintAttachment::where('complaint_id', $complaint->id)->findOrFail($attachmentId);
         $user = $request->user();
-
+        if(!$user::hasPermission('cases.evidences'))
         $isPoliceOrAdmin = $user->roles()
             ->whereIn('roles.name', ['police', 'admin'])
             ->exists();
