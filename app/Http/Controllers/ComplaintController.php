@@ -175,10 +175,6 @@ class ComplaintController extends Controller
     public function requestMoreEvidence(Request $request, $id)
     {
         $complaint = Complaint::findOrFail($id);
-        $user = $request->User();
-       if(!$user->hasPermission('complaint.request_more_evidence')){
-        abort(403,'kamu tidak memiliki permission untuk meminta bukti tambahan');
-       }
         if ($complaint->investigationCase()->exists()) {
             return response()->json([
                 'message' => 'complaint sudah jadi kasus dan tidak dapat di ubah'
@@ -196,10 +192,6 @@ class ComplaintController extends Controller
     public function reject(Request $request, $id)
     {
         $complaint = Complaint::findOrFail($id);
-        $user = $request->User();
-        if(!$user->hasPermission('complaint.reject')){
-            abort(403,'kamu tidak memiliki permission untuk reject');
-        }
         if ($complaint->investigationCase()->exists()) {
             return response()->json([
                 'message' => 'complaint sudah jadi kasus dan tidak dapat di ubah'

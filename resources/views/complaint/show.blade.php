@@ -83,6 +83,8 @@
             Edit Complaint
         </a>
     @endif
+
+    
     @if ($complaint->status === 'Pending')
 
     @if (auth()->user()->hasPermission('complaint.request_more_evidence'))
