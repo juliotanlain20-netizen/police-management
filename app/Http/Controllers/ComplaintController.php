@@ -13,6 +13,7 @@ class ComplaintController extends Controller
 {
     public function index(Request $request)
     {
+
         $user = $request->user();
         $query = Complaint::with('category');
 
@@ -40,7 +41,7 @@ class ComplaintController extends Controller
         $complaint = Complaint::where('id', $id)
             ->with(['category', 'attachments'])->firstOrFail();
         $user = $request->user(); //sedang login
-        $canViewall= $user->hasPermission('complaint.view_all');
+        $canViewall = $user->hasPermission('complaint.view_all');
         // Draft selalu private
         if (
             $complaint->status === 'Draft' &&
@@ -81,7 +82,8 @@ class ComplaintController extends Controller
 
     public function store(ComplaintRequest $request)
     {
-        if ($request->action === 'submit') {
+        $data = $request->validated();
+        if (($data['action'] ?? null) === 'submit') {
             $status = 'Pending';
         } else {
             $status = 'Draft';
@@ -89,11 +91,11 @@ class ComplaintController extends Controller
 
         $complaint = Complaint::create([
             'user_id' => $request->user()->id,
-            'category_id' => $request['category_id'],
-            'title' => $request['title'],
-            'description' => $request['description'],
-            'incident_date' => $request['incident_date'],
-            'location' => $request['location'],
+            'category_id' => $data['category_id']?? null,
+            'title' => $data['title']?? null,
+            'description' => $data['description']?? null,
+            'incident_date' => $data['incident_date']?? null,
+            'location' => $data['location']?? null,
             'status' => $status,
         ]);
 
@@ -101,7 +103,7 @@ class ComplaintController extends Controller
             foreach ($request->file('attachments') as $file) {
                 $path = $file->store('complaint-attachments');
 
-                $attachment = ComplaintAttachment::create([
+                ComplaintAttachment::create([
                     'complaint_id' => $complaint->id,
                     'file_name' => $file->getClientOriginalName(),
                     'file_path' => $path,
@@ -115,7 +117,7 @@ class ComplaintController extends Controller
     }
     public function edit(Request $request, $id)
     {
-        $complaint = Complaint::findOrfail($id);
+        $complaint = Complaint::findOrFail($id);
         $categories = ComplaintCategory::all();
         if ($complaint->user_id !== $request->user()->id) {
             abort(403, 'gak boleh liat complaint orang lain');
@@ -125,7 +127,6 @@ class ComplaintController extends Controller
         }
         return view('complaint.edit', ['complaint' => $complaint, 'categories' => $categories]);
     }
-    //BELUM SELESAI
     public function update(ComplaintRequest $request, $id)
     {
         $complaint = Complaint::findOrfail($id);
@@ -139,15 +140,15 @@ class ComplaintController extends Controller
         if (!in_array($complaint->status, ['Draft', 'Need More Evidence'])) {
             abort(403, 'Complaint dengan status ini tidak dapat diedit');
         }
-
+        $data = $request->validated();
         $complaint->update([
-            'title' => $request['title'],
-            'category_id' => $request['category_id'],
-            'description' => $request['description'],
-            'incident_date' => $request['incident_date'],
-            'location' => $request['location'],
+            'title' => $data['title']?? null,
+            'category_id' => $data['category_id']?? null,
+            'description' => $data['description']?? null,
+            'incident_date' => $data['incident_date']?? null,
+            'location' => $data['location']?? null,
         ]);
-        if ($request->action === 'submit') {
+        if (($data['action'] ?? null) === 'submit') {
             $complaint->update([
                 'status' => 'Pending'
             ]);
@@ -158,6 +159,7 @@ class ComplaintController extends Controller
     {
         $user = $request->User();
         $complaint = Complaint::findOrFail($id);
+
         if ($complaint->user_id !== $user->id) {
             abort(403, 'hanya pemilik yang boleh hapus complaint sendiri');
         }
@@ -172,7 +174,7 @@ class ComplaintController extends Controller
         $complaint->delete();
         return redirect()->route('complaint');
     }
-    public function requestMoreEvidence(Request $request, $id)
+    public function requestMoreEvidence($id)
     {
         $complaint = Complaint::findOrFail($id);
         if ($complaint->investigationCase()->exists()) {
@@ -189,7 +191,7 @@ class ComplaintController extends Controller
         ]);
         return redirect()->route('complaint.show', $complaint->id);
     }
-    public function reject(Request $request, $id)
+    public function reject($id)
     {
         $complaint = Complaint::findOrFail($id);
         if ($complaint->investigationCase()->exists()) {

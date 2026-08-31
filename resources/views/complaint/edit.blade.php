@@ -9,6 +9,7 @@
 <body>
     <h1> edit complaint</h1>
     {{$complaint}}
+    
     <form action="{{route('complaint.update', $complaint)}}" method="post">
         @csrf
         @method('PUT')

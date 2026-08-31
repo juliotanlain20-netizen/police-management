@@ -7,13 +7,14 @@ use App\Http\Requests\StoreInvestigationRequest;
 use App\Models\Complaint;
 use App\Models\InvestigationCase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class InvestigationCaseController extends Controller
 {
     public function index()
     {
         $cases = InvestigationCase::all();
-        return $cases;
+        return view('cases.index', compact('cases'));
     }
     public function show($id)
     {
@@ -28,32 +29,43 @@ class InvestigationCaseController extends Controller
             'priority',
             'opened_at',
             'closed_at',
-        ])->with(['suspects', 'complaint.attachments','evidences'])->firstOrFail();
-        return $case;
+        ])->with(['suspects', 'complaint.attachments', 'evidences'])->firstOrFail();
+        return view('cases.show', ['case' => $case]);
         //'complaint.attachments' melalui complaint, ambil complaintattachment karna kan tersambung dengan complaint
         // itu with('berdasarkan nama method di belongsto di model')
     }
     public function store(StoreInvestigationRequest $request, $id)
-    {
-        $complaint = Complaint::findOrFail($id);
-        if($complaint->investigationCase()->exists()){
-            return response()->json([
-                'message'=>'complaint sudah menjadi case'
-            ],409);
-        }
-        $case = InvestigationCase::create([
-            'complaint_id' => $complaint->id,
-            'case_number' => $request['case_number'],
-            'title' => $complaint->title,
-            'description' => $complaint->description,
-            'status' => 'Open',
-            'priority' => $request['priority'],
-            'opened_at' => now()
-        ]);
-        $complaint->update([
-            'status' => 'Approved'
-        ]);
+    { //lock yang akan di urus
+        DB::transaction(function () use ($request, $id) {
+            $complaint = Complaint::whereKey($id)->lockForUpdate()
+                ->findOrFail($id);
+
+            if ($complaint->investigationCase()->exists()) {
+                return abort(403, 'complaint sudah menjadi case');
+            }
+            if ($complaint->status !== 'Pending') {
+                abort(403, 'Hanya complaint berstatus Pending yang dapat di jadikan kasus');
+            }
+
+            InvestigationCase::create([
+                'complaint_id' => $complaint->id,
+                'case_number' => $request['case_number'],
+                'title' => $complaint->title,
+                'description' => $complaint->description,
+                'status' => 'Open',
+                'priority' => $request['priority'],
+                'opened_at' => now()
+            ]);
+            $complaint->update([
+                'status' => 'Approved'
+            ]);
+        });
         return $this->index();
+    }
+    public function edit($id)
+    {
+        $case = InvestigationCase::findOrFail($id);
+        return view('cases.edit', ['case' => $case]);
     }
     public function update(InvestigationRequest $request, $id)
     {
@@ -70,7 +82,13 @@ class InvestigationCaseController extends Controller
         $data = $request->validated();
 
         if (isset($data['status'])) {
-            $data['closed_at'] = $data['status'] === 'Closed'? now() : null;
+            if ($data['status'] === 'Closed' && $case->status !== 'Closed') {
+                $data['closed_at'] = now();
+            }
+
+            if ($data['status'] !== 'Closed') {
+                $data['closed_at'] = null;
+            }
         }
         $case->update($data);
         return $this->show($id);

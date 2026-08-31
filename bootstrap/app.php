@@ -15,7 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             // 'isAdmin'=>\App\http\Middleware\CheckMembership::class
             // 'role'=>\App\http\Middleware\RoleMiddleware::class
-            'permission'=>\App\http\Middleware\PermissionMiddlleware::class
+            'permission'=>\App\http\Middleware\PermissionMiddlleware::class,
+            'admin'=>\App\http\Middleware\AdminMiddlleware::class
 
         ]);
         //nah ini untuk yang di controller yang auth itu loh
