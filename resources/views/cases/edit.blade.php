@@ -23,7 +23,7 @@
         method="POST"
     >
         @csrf
-        @method('PUT')
+        @method('PATCH')
 
         <div>
             <label for="case_number">

@@ -30,7 +30,8 @@ class InvestigationCase extends Model
         return $this->hasMany(Suspect::class,'investigation_case_id','id');
     }
     public function officers(){
-        return $this->belongsToMany(PoliceOfficer::class,'case_officers','investigation_case_id', 'police_officer_id' );
+        return $this->belongsToMany(PoliceOfficer::class,'case_officers','investigation_case_id', 'police_officer_id' )
+        ->withPivot(['status','assigned_at'])->withTimestamps();
     }
 
 }

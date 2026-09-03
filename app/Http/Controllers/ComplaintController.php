@@ -83,7 +83,7 @@ class ComplaintController extends Controller
     public function store(ComplaintRequest $request)
     {
         $data = $request->validated();
-        if (($data['action'] ?? null) === 'submit') {
+        if (($data['action']) === 'submit') {
             $status = 'Pending';
         } else {
             $status = 'Draft';
@@ -91,11 +91,11 @@ class ComplaintController extends Controller
 
         $complaint = Complaint::create([
             'user_id' => $request->user()->id,
-            'category_id' => $data['category_id']?? null,
-            'title' => $data['title']?? null,
-            'description' => $data['description']?? null,
-            'incident_date' => $data['incident_date']?? null,
-            'location' => $data['location']?? null,
+            'category_id' => $data['category_id'],
+            'title' => $data['title'],
+            'description' => $data['description'],
+            'incident_date' => $data['incident_date'],
+            'location' => $data['location'],
             'status' => $status,
         ]);
 
@@ -142,13 +142,13 @@ class ComplaintController extends Controller
         }
         $data = $request->validated();
         $complaint->update([
-            'title' => $data['title']?? null,
-            'category_id' => $data['category_id']?? null,
-            'description' => $data['description']?? null,
-            'incident_date' => $data['incident_date']?? null,
-            'location' => $data['location']?? null,
+            'title' => $data['title'],
+            'category_id' => $data['category_id'],
+            'description' => $data['description'],
+            'incident_date' => $data['incident_date'],
+            'location' => $data['location'],
         ]);
-        if (($data['action'] ?? null) === 'submit') {
+        if (($data['action']) === 'submit') {
             $complaint->update([
                 'status' => 'Pending'
             ]);

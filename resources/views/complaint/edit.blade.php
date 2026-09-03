@@ -12,7 +12,7 @@
     
     <form action="{{route('complaint.update', $complaint)}}" method="post">
         @csrf
-        @method('PUT')
+        @method('PATCH')
         <div>
         <label for="title">title</label>
         <input type="text" name="title" id="title" value="{{$complaint->title}}">

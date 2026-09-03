@@ -47,7 +47,7 @@ class PoliceController extends Controller
                 'rank_id' => $data['rank_id'],
                 'unit_id' => $data['unit_id'],
                 'nrp' => $data['nrp'],
-                'address' => $data['address'] ?? null,
+                'address' => $data['address'],
                 'status' => 'Active',
             ]);
         });
@@ -61,7 +61,7 @@ class PoliceController extends Controller
             'unit_id' => $data['unit_id'],
             'rank_id' => $data['rank_id'],
             'nrp' => $data['nrp'],
-            'address' => $data['address'] ?? null,
+            'address' => $data['address'],
             'status' => $data['status'],
         ]);
         return redirect()->route('police.show', $police->id);

@@ -48,7 +48,26 @@
             </tbody>
         </table>
     @endif
+{{-- ========================================================= --}}
+{{-- TEMPORARY DEBUG NAVIGATION - HAPUS NANTI                  --}}
+{{-- ========================================================= --}}
+<div style="margin-bottom: 20px;">
+    <a href="{{ route('complaint') }}">
+        Complaint
+    </a>
 
+    |
+
+    <a href="{{ route('cases.index') }}">
+        Investigation Cases
+    </a>
+
+    |
+
+    <a href="{{ route('police.index') }}">
+        Police Officers
+    </a>
+</div>
     
 </body>
 </html>

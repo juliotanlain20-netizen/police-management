@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\InvestigationRequest;
 use App\Http\Requests\StoreInvestigationRequest;
 use App\Models\Complaint;
+use App\Models\EvidenceCategory;
 use App\Models\InvestigationCase;
+use App\Models\PoliceOfficer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -18,6 +20,8 @@ class InvestigationCaseController extends Controller
     }
     public function show($id)
     {
+        $police = PoliceOfficer::where('status', 'Active')->with('user')->get();
+        $evidenceCategories = EvidenceCategory::all();
         // return 'masuk controller, id = ' . $id;
         $case = InvestigationCase::where('id', $id)->select([
             'id',
@@ -29,8 +33,8 @@ class InvestigationCaseController extends Controller
             'priority',
             'opened_at',
             'closed_at',
-        ])->with(['suspects', 'complaint.attachments', 'evidences'])->firstOrFail();
-        return view('cases.show', ['case' => $case]);
+        ])->with(['suspects', 'complaint.attachments', 'evidences', 'officers.user'])->firstOrFail();
+        return view('cases.show', compact('case', 'police', 'evidenceCategories'));
         //'complaint.attachments' melalui complaint, ambil complaintattachment karna kan tersambung dengan complaint
         // itu with('berdasarkan nama method di belongsto di model')
     }
@@ -38,10 +42,10 @@ class InvestigationCaseController extends Controller
     { //lock yang akan di urus
         DB::transaction(function () use ($request, $id) {
             $complaint = Complaint::whereKey($id)->lockForUpdate()
-                ->findOrFail($id);
+                ->findOrFail();
 
             if ($complaint->investigationCase()->exists()) {
-                return abort(403, 'complaint sudah menjadi case');
+                return abort(409, 'complaint sudah menjadi case');
             }
             if ($complaint->status !== 'Pending') {
                 abort(403, 'Hanya complaint berstatus Pending yang dapat di jadikan kasus');

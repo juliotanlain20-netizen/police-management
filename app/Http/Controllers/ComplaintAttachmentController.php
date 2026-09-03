@@ -25,7 +25,6 @@ class ComplaintAttachmentController extends Controller
         ]);
         $file = $request->file('attachment'); //nanti dari html posting sesuatu
         $path = $file->store('complaint-attachments'); //simpan ke complaint-attachment
-
         $attachment = ComplaintAttachment::create([
             'complaint_id' => $complaint->id,
             'file_name' => $file->getClientOriginalName(),
@@ -34,7 +33,9 @@ class ComplaintAttachmentController extends Controller
             'file_size' => $file->getSize(),
             'uploaded_at' => now()
         ]);
-        return redirect()->Route('complaint.show', $complaint->id);
+        return redirect()
+            ->route('complaint.edit', $complaint->id)
+            ->with('success', 'Attachment berhasil dihapus');
     }
     public function show(Request $request, $complaintId, $attachmentId)
     {

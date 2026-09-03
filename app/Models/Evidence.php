@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
+
 #[Table('evidences')]
 #[Fillable([
     'investigation_case_id',
@@ -14,9 +15,14 @@ use Illuminate\Database\Eloquent\Model;
     'description',
     'storage_location',
     'status',
+    'record_status'
 ])]
 class Evidence extends Model
 {
+    public function attachments()
+    {
+        return $this->hasMany(EvidenceAttachment::class);
+    }
     public function investigationCase()
     {
         return $this->belongsTo(InvestigationCase::class, 'investigation_case_id', 'id');
