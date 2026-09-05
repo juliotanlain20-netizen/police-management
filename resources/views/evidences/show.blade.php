@@ -9,6 +9,11 @@
 <body>
 
     <h1>Detail Evidence</h1>
+        @if (session('success'))
+    <div>
+        {{ session('success') }}
+    </div>
+@endif
 
     <p>
         <strong>Evidence Code:</strong>

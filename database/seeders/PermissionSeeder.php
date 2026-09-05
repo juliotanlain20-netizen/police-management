@@ -13,7 +13,11 @@ class PermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        $permissions=[
+         $permissions = [
+
+            // =========================
+            // COMPLAINT
+            // =========================
             [
                 'name' => 'View All Complaints',
                 'slug' => 'complaint.view_all',
@@ -29,6 +33,10 @@ class PermissionSeeder extends Seeder
                 'slug' => 'complaint.reject',
                 'description' => 'Menolak complaint yang masih Pending',
             ],
+
+            // =========================
+            // INVESTIGATION CASE
+            // =========================
             [
                 'name' => 'Create Investigation Case',
                 'slug' => 'case.create',
@@ -44,14 +52,80 @@ class PermissionSeeder extends Seeder
                 'slug' => 'case.update',
                 'description' => 'Mengubah data dan status investigation case',
             ],
+            [
+                'name' => 'Assign Officer',
+                'slug' => 'case.assign_officer',
+                'description' => 'Mengatur penugasan police officer pada investigation case',
+            ],
+
+            // =========================
+            // POLICE
+            // =========================
+            [
+                'name' => 'View All Police',
+                'slug' => 'police.view_all',
+                'description' => 'Melihat seluruh daftar police officer',
+            ],
+
+            // =========================
+            // EVIDENCE
+            // =========================
+            [
+                'name' => 'View Evidence',
+                'slug' => 'evidence.view',
+                'description' => 'Melihat evidence, attachment, dan history evidence',
+            ],
+            [
+                'name' => 'Create Evidence',
+                'slug' => 'evidence.create',
+                'description' => 'Menambahkan evidence ke investigation case',
+            ],
+            [
+                'name' => 'Update Evidence',
+                'slug' => 'evidence.update',
+                'description' => 'Mengubah data, status, dan lokasi evidence',
+            ],
+            [
+                'name' => 'Void Evidence',
+                'slug' => 'evidence.void',
+                'description' => 'Menandai record evidence sebagai Voided',
+            ],
+            [
+                'name' => 'Manage Evidence Attachments',
+                'slug' => 'evidence.manage_attachment',
+                'description' => 'Menambah dan menghapus attachment evidence',
+            ],
+
+            // =========================
+            // SUSPECT
+            // =========================
+            [
+                'name' => 'View Suspect',
+                'slug' => 'suspect.view',
+                'description' => 'Melihat data suspect pada investigation case',
+            ],
+            [
+                'name' => 'Create Suspect',
+                'slug' => 'suspect.create',
+                'description' => 'Menambahkan suspect ke investigation case',
+            ],
+            [
+                'name' => 'Update Suspect',
+                'slug' => 'suspect.update',
+                'description' => 'Mengubah data dan status suspect',
+            ],
         ];
-        //biar tidak double saat di jalankan ulang
-        foreach($permissions as $permission){
+
+        foreach ($permissions as $permission) {
             Permission::updateOrCreate(
-                ['slug'=>$permission['slug']],
-                $permission
+                [
+                    'slug' => $permission['slug'],
+                ],
+                [
+                    'name' => $permission['name'],
+                    'description' => $permission['description'],
+                ]
             );
         }
-
     }
 }

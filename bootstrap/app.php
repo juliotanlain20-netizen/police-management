@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Middleware\ActivePoliceMiddleware;
+use App\Http\Middleware\AdminMidlleware;
+use App\Http\Middleware\PermissionMiddlleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,21 +16,14 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            // 'isAdmin'=>\App\http\Middleware\CheckMembership::class
-            // 'role'=>\App\http\Middleware\RoleMiddleware::class
-            'permission'=>\App\http\Middleware\PermissionMiddlleware::class,
-            'admin'=>\App\http\Middleware\AdminMiddlleware::class
+            'permission'=>PermissionMiddlleware::class,
+            'admin'=>AdminMidlleware::class,
+            'active.police' => ActivePoliceMiddleware::class,
 
         ]);
-        //nah ini untuk yang di controller yang auth itu loh
         $middleware->redirectGuestsTo(
             fn (Request $request)=>route('login.form')
         );
-    //untuk middlaware csrf, yang harus di blade
-    //kalau gak pake ini,nanti gak bisa di chek di thunder client, harus blade 
-        $middleware->validateCsrfTokens(except: [
-            '*',
-        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

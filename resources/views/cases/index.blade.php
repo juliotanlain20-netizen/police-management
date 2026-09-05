@@ -9,7 +9,11 @@
 <body>
 
     <h1>Investigation Cases</h1>
-
+    @if (session('success'))
+    <div>
+        {{ session('success') }}
+    </div>
+@endif
     @forelse ($cases as $case)
         <div>
             <p>

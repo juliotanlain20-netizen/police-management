@@ -11,9 +11,10 @@ class ComplaintAttachmentController extends Controller
 {
 
 
-    public function Store(Request $request, $complaintId)
+    public function store(Request $request, $complaintId)
     {
         $complaint = Complaint::findOrFail($complaintId);
+
         if ($complaint->user_id !== $request->user()->id) {
             abort(403, 'hanya pemilik yang boleh tambah attachment ');
         }
@@ -35,7 +36,7 @@ class ComplaintAttachmentController extends Controller
         ]);
         return redirect()
             ->route('complaint.edit', $complaint->id)
-            ->with('success', 'Attachment berhasil dihapus');
+            ->with('success', 'Attachment berhasil ditambah');
     }
     public function show(Request $request, $complaintId, $attachmentId)
     {
@@ -45,17 +46,10 @@ class ComplaintAttachmentController extends Controller
             'complaint_id',
             $complaint->id
         )->findOrFail($attachmentId);
-
-        $user = $request->user();
-        $isPoliceOrAdmin = $user->roles()
-            ->whereIn('roles.name', ['police', 'admin'])
-            ->exists();
-        if ($complaint->status === 'Draft' && $complaint->user_id !== $user->id) {
-            abort(403);
-        }
-        if (!$isPoliceOrAdmin && $complaint->user_id !== $user->id) {
-            abort(403);
-        }
+        $this->ensureCanView(
+            $request,
+            $complaint
+        );
         if (!Storage::exists($attachment->file_path)) {
             return response('File attachment tidak ditemukan di storage', 404);
         }
@@ -72,17 +66,11 @@ class ComplaintAttachmentController extends Controller
     {
         $complaint = Complaint::findOrFail($complaintId);
         $attachment = ComplaintAttachment::where('complaint_id', $complaint->id)->findOrFail($attachmentId);
-        $user = $request->user();
 
-        $isPoliceOrAdmin = $user->roles()
-            ->whereIn('roles.name', ['police', 'admin'])
-            ->exists();
-        if ($complaint->status === 'Draft' && $complaint->user_id !== $user->id) {
-            abort(403);
-        }
-        if (!$isPoliceOrAdmin && $complaint->user_id !== $user->id) {
-            abort(403);
-        }
+        $this->ensureCanView(
+            $request,
+            $complaint
+        );
         if (!Storage::exists($attachment->file_path)) {
             return response('File attachment tidak ditemukan di storage', 404);
         }
@@ -110,5 +98,27 @@ class ComplaintAttachmentController extends Controller
         return redirect()
             ->route('complaint.edit', $complaint->id)
             ->with('success', 'Attachment berhasil dihapus');
+    }
+    private function ensureCanView(
+        Request $request,
+        Complaint $complaint
+    ): void {
+        $user = $request->user();
+
+        // Draft hanya boleh dilihat pemilik
+        if (
+            $complaint->status === 'Draft' &&
+            $complaint->user_id !== $user->id
+        ) {
+            abort(403);
+        }
+
+        // Complaint orang lain perlu permission view_all
+        if (
+            $complaint->user_id !== $user->id &&
+            !$user->hasPermission('complaint.view_all')
+        ) {
+            abort(403);
+        }
     }
 }

@@ -20,13 +20,18 @@ class EvidenceController extends Controller
     }
     public function show($id)
     {
-        $evidence = Evidence::with(['category', 'investigationCase', 'attachments'])->findOrFail($id);
+        $evidence = Evidence::with(['category', 'investigationCase', 'attachments', 'evidenceHistory.user',])->findOrFail($id);
         return view('evidences.show', compact('evidence'));
     }
+
     public function store(Request $request, $caseId)
     {
         $case = InvestigationCase::findOrFail($caseId);
-        $request->validate([
+        $this->ensureAssignedToCase(
+            $request->user(),
+            $case
+        );
+        $data = $request->validate([
             'evidence_category_id' => 'required|exists:evidence_categories,id',
             'evidence_code' => 'required|string|max:50|unique:evidences,evidence_code',
             'name' => 'required|string|max:150',
@@ -35,14 +40,15 @@ class EvidenceController extends Controller
             'attachments' => 'nullable|array',
             'attachments.*' => 'file|mimes:jpg,jpeg,png,pdf|max:10240',
         ]);
-        DB::transaction(function () use ($request, $case) {
+
+        DB::transaction(function () use ($request, $data, $case) {
             $evidence = Evidence::create([
                 'investigation_case_id' => $case->id,
-                'evidence_category_id' => $request['evidence_category_id'],
-                'evidence_code' => $request['evidence_code'],
-                'name' => $request['name'],
-                'description' => $request['description'],
-                'storage_location' => $request['storage_location'],
+                'evidence_category_id' => $data['evidence_category_id'],
+                'evidence_code' => $data['evidence_code'],
+                'name' => $data['name'],
+                'description' => $data['description'],
+                'storage_location' => $data['storage_location'],
                 'status' => 'Stored',
                 'record_status' => 'Valid',
             ]);
@@ -67,21 +73,37 @@ class EvidenceController extends Controller
                 }
             }
         });
-        return redirect()->route('evidence.index');
+        return redirect()->route('evidence.index')->with('success', 'Berhasil menambah evidence');
     }
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
-        $evidence = Evidence::findOrFail($id);
+
+        
+        $evidence = Evidence::with('investigationCase')
+            ->findOrFail($id);
+
+        $this->ensureAssignedToCase(
+            $request->user(),
+            $evidence->investigationCase
+        );
         $categories = EvidenceCategory::all();
+        if ($evidence->record_status === 'Voided') {
+            abort(409, 'Evidence yang sudah voided tidak dapat diubah');
+        }
         return view('evidences.edit', compact(['evidence', 'categories']));
     }
     public function update(UpdateEvidenceRequest $request, $id)
     {
-        $evidence = Evidence::findOrFail($id);
+        $evidence = Evidence::with('investigationCase')
+            ->findOrFail($id);
+
+        $this->ensureAssignedToCase(
+            $request->user(),
+            $evidence->investigationCase
+        );
         if ($evidence->record_status === 'Voided') {
             abort(409, 'Evidence yang sudah voided tidak dapat diubah');
         }
-
         $data = $request->validated();
         DB::transaction(function () use ($request, $evidence, $data) {
             $oldStatus = $evidence->status;
@@ -112,18 +134,24 @@ class EvidenceController extends Controller
                 ]);
             }
         });
-        return redirect()->route('evidence.show', $evidence->id);
+        return redirect()->route('evidence.show', $evidence->id)->with('success', 'Evidence berhasil di update');
     }
     //untuk liat apakah evidence ini valid atau tidak
     public function void(Request $request, $id)
     {
+        $evidence = Evidence::with('investigationCase')
+            ->findOrFail($id);
+        $this->ensureAssignedToCase(
+            $request->user(),
+            $evidence->investigationCase
+        );
         $request->validate([
             'reason' => 'required|string|max:1000',
         ]);
 
-        DB::transaction(function () use ($request, $id) {
+        DB::transaction(function () use ($request,$evidence, $id) {
 
-            $evidence = Evidence::findOrFail($id);
+
 
             if ($evidence->record_status === 'Voided') {
                 abort(409, 'Evidence ini sudah Voided');
@@ -141,6 +169,6 @@ class EvidenceController extends Controller
             ]);
         });
 
-        return redirect()->route('evidence.index');
+        return redirect()->route('evidence.index')->with('success', 'Evidence berhasil di buat jadi voided');
     }
 }

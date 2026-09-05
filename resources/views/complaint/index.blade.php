@@ -8,6 +8,11 @@
 </head>
 <body>
     <h1> complaint dari index</h1>
+        @if (session('success'))
+    <div>
+        {{ session('success') }}
+    </div>
+@endif
     <form action="{{ route('logout') }}" method="POST">
     @csrf
 

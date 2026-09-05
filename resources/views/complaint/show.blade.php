@@ -11,6 +11,11 @@
 <body>
 
     <h1>Detail Complaint</h1>
+        @if (session('success'))
+    <div>
+        {{ session('success') }}
+    </div>
+@endif
 
     <h2>Informasi Complaint</h2>
 
@@ -86,6 +91,36 @@
 
     
     @if ($complaint->status === 'Pending')
+    @if (auth()->user()->hasPermission('case.create'))
+    <form
+        action="{{ route('cases.store', $complaint->id) }}"
+        method="POST"
+        style="display: inline-block;"
+    >
+        @csrf
+
+        <input
+            type="text"
+            name="case_number"
+            placeholder="Case Number"
+            required
+        >
+
+        <select name="priority" required>
+            <option value="">Pilih Priority</option>
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+        </select>
+
+        <button
+            type="submit"
+            onclick="return confirm('Convert complaint ini menjadi investigation case?')"
+        >
+            Convert to Case
+        </button>
+    </form>
+@endif
 
     @if (auth()->user()->hasPermission('complaint.request_more_evidence'))
         <form

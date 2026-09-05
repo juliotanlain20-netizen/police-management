@@ -6,6 +6,7 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -14,9 +15,13 @@ class AuthController extends Controller
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
+
         ]);
-        //only= ambil field tertentu dari request
-        $credentials = $request->only('email', 'password');
+        $credentials = [
+            'email' => $request->email,
+            'password' => $request->password,
+            'status' => 'active',
+        ];
         //attempt=mengechek email dan password
         if (Auth::attempt($credentials)) {
             //buat session dan buat session baru
@@ -42,52 +47,27 @@ class AuthController extends Controller
             'password' => 'required|confirmed|min:8',
         ], [
             'name.required' => 'harus isi nama',
-            'phone.required' => 'harus isi nomor',
             'email.required' => 'harus isi email',
             'email.unique' => 'email sudah ada',
             'password.required' => 'isi password',
             'password.confirmed' => 'pastikan dong',
             'password.min' => 'minimal 8 char',
         ]);
-        $user = User::create([
-            'name' => $request->name,
-            'phone' => $request->phone,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'status' => 'active',
-        ]);
-        $citizenRole = Role::where('name', 'citizen')->firstOrFail();
-        $user->roles()->attach($citizenRole->id);
+        DB::transaction(function () use ($request) {
+
+            $user = User::create([
+                'name' => $request->name,
+                'phone' => $request->phone,
+                'email' => $request->email,
+                'password' => bcrypt($request->password),
+                'status' => 'active',
+            ]);
+            $citizenRole = Role::where('name', 'citizen')->firstOrFail();
+            $user->roles()->attach($citizenRole->id);
+        });
         return redirect()->route('login.form')->with('success', 'registration succesfull!');
     }
-    public function registerAdmin(Request $request)
-    {
-        $request->validate([
-            'name' => 'required',
-            'phone' => 'nullable',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|confirmed|min:8',
-        ], [
-            'name.required' => 'harus isi nama',
-            'phone.required' => 'harus isi nomor',
-            'email.required' => 'harus isi email',
-            'email.unique' => 'email sudah ada',
-            'password.required' => 'isi password',
-            'password.confirmed' => 'pastikan dong',
-            'password.min' => 'minimal 8 char',
-        ]);
-        $user = User::create([
-            'name' => $request->name,
-            'phone' => $request->phone,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'status' => 'active',
-        ]);
-        $citizenRole = Role::where('name', 'admin')->firstOrFail();
-        $user->roles()->attach($citizenRole->id);
-        return redirect()->route('login.form')->with('success', 'registration succesfull!');
-    }
-    public function showloginForm()
+    public function showLoginForm()
     {
         return view('auth.login');
     }

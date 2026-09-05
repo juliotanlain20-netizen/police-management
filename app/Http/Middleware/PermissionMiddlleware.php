@@ -21,7 +21,7 @@ class PermissionMiddlleware
             abort(403, 'kamu harus login');
         }
         if (!$user->hasPermission($permission)) {
-            abort(403, 'kamu tidak memiliki permission untuk melakukan aksi iniiiii');
+            abort(403, 'kamu tidak memiliki permission untuk melakukan aksi ini');
         }
         return $next($request);
     }

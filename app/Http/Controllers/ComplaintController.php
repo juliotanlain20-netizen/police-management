@@ -7,6 +7,7 @@ use App\Models\Complaint;
 use App\Models\ComplaintAttachment;
 use App\Models\ComplaintCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ComplaintController extends Controller
@@ -59,20 +60,6 @@ class ComplaintController extends Controller
         return view('complaint.show', [
             'complaint' => $complaint,
         ]);
-        // return view('complaint.show', compact('complaint'));
-        // return view('complaint.show', $complaint);
-        // $complaint = Complaint::where('id', $id)->select([
-        //     'id',
-        //     'category_id',
-        //     'title',
-        //     'description',
-        //     'incident_date',
-        //     'location',
-        //     'status',
-        //     'updated_at'
-        // ])->with('category')->firstOrFail();
-        // return $complaint;
-        // itu with('berdasarkan nama method di belongsto di model')
     }
     public function create()
     {
@@ -88,32 +75,33 @@ class ComplaintController extends Controller
         } else {
             $status = 'Draft';
         }
+        DB::transaction(function () use ($request, $data, $status) {
+            $complaint = Complaint::create([
+                'user_id' => $request->user()->id,
+                'category_id' => $data['category_id'],
+                'title' => $data['title'],
+                'description' => $data['description'],
+                'incident_date' => $data['incident_date'],
+                'location' => $data['location'],
+                'status' => $status,
+            ]);
 
-        $complaint = Complaint::create([
-            'user_id' => $request->user()->id,
-            'category_id' => $data['category_id'],
-            'title' => $data['title'],
-            'description' => $data['description'],
-            'incident_date' => $data['incident_date'],
-            'location' => $data['location'],
-            'status' => $status,
-        ]);
+            if ($request->hasFile('attachments')) {
+                foreach ($request->file('attachments') as $file) {
+                    $path = $file->store('complaint-attachments');
 
-        if ($request->hasFile('attachments')) {
-            foreach ($request->file('attachments') as $file) {
-                $path = $file->store('complaint-attachments');
-
-                ComplaintAttachment::create([
-                    'complaint_id' => $complaint->id,
-                    'file_name' => $file->getClientOriginalName(),
-                    'file_path' => $path,
-                    'mime_type' => $file->getMimeType(),
-                    'file_size' => $file->getSize(),
-                    'uploaded_at' => now()
-                ]);
+                    ComplaintAttachment::create([
+                        'complaint_id' => $complaint->id,
+                        'file_name' => $file->getClientOriginalName(),
+                        'file_path' => $path,
+                        'mime_type' => $file->getMimeType(),
+                        'file_size' => $file->getSize(),
+                        'uploaded_at' => now()
+                    ]);
+                }
             }
-        }
-        return redirect()->route('complaint');
+        });
+        return redirect()->route('complaint')->with('success', 'berhasil buat complaint baru');
     }
     public function edit(Request $request, $id)
     {
@@ -153,11 +141,11 @@ class ComplaintController extends Controller
                 'status' => 'Pending'
             ]);
         }
-        return redirect()->route('complaint.show', $complaint->id);
+        return redirect()->route('complaint.show', $complaint->id)->with('success', 'complaint berhasil di update');
     }
     public function destroy(Request $request, $id)
     {
-        $user = $request->User();
+        $user = $request->user();
         $complaint = Complaint::findOrFail($id);
 
         if ($complaint->user_id !== $user->id) {
@@ -172,15 +160,13 @@ class ComplaintController extends Controller
             Storage::delete($attachment->file_path);
         }
         $complaint->delete();
-        return redirect()->route('complaint');
+        return redirect()->route('complaint')->with('success', 'complaint berhasil di hapus');
     }
     public function requestMoreEvidence($id)
     {
         $complaint = Complaint::findOrFail($id);
         if ($complaint->investigationCase()->exists()) {
-            return response()->json([
-                'message' => 'complaint sudah jadi kasus dan tidak dapat di ubah'
-            ], 409);
+            abort(409, 'Complaint sudah menjadi case dan tidak dapat diubah');
         }
         if ($complaint->status !== 'Pending') {
             abort(403, 'hanya boleh merubah yang berstatus pending');
@@ -189,15 +175,13 @@ class ComplaintController extends Controller
         $complaint->update([
             'status' => 'Need More Evidence'
         ]);
-        return redirect()->route('complaint.show', $complaint->id);
+        return redirect()->route('complaint.show', $complaint->id)->with('success', 'Berhasil request More Evidence');
     }
     public function reject($id)
     {
         $complaint = Complaint::findOrFail($id);
         if ($complaint->investigationCase()->exists()) {
-            return response()->json([
-                'message' => 'complaint sudah jadi kasus dan tidak dapat di ubah'
-            ], 409);
+            abort(409, 'Complaint sudah menjadi case dan tidak dapat diubah');
         }
         if ($complaint->status !== 'Pending') {
             abort(403, 'hanya boleh merubah yang berstatus pending');
@@ -205,7 +189,7 @@ class ComplaintController extends Controller
         $complaint->update([
             'status' => 'Rejected'
         ]);
-        return redirect()->route('complaint.show', $complaint->id);
+        return redirect()->route('complaint.show', $complaint->id)->with('success', 'Berhasil reject');
     }
     //untuk status need more evidence dan draft
 }

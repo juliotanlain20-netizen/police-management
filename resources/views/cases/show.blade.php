@@ -8,6 +8,12 @@
 
 <body>
     <h1>Detail Investigation Case</h1>
+
+        @if (session('success'))
+    <div>
+        {{ session('success') }}
+    </div>
+@endif
     <p><strong>ID:</strong> {{ $case->id }}</p>
     <p><strong>Case Number:</strong> {{ $case->case_number }}</p>
     <p><strong>Title:</strong> {{ $case->title }}</p>
@@ -35,22 +41,254 @@
 
     <hr>
 
-    <h2>Suspects</h2>
+    <hr>
 
-    @forelse ($case->suspects as $suspect)
-        <p>{{ $suspect->name }}</p>
-    @empty
-        <p>Belum ada suspect.</p>
-    @endforelse
+<h2>Suspects</h2>
+
+@if ($case->suspects->isEmpty())
+    <p>Belum ada suspect pada kasus ini.</p>
+@else
+    <table border="1" cellpadding="8">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Identity Number</th>
+                <th>Address</th>
+                <th>Status</th>
+                <th>Notes</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach ($case->suspects as $suspect)
+                <tr>
+                    <td>{{ $suspect->name }}</td>
+
+                    <td>
+                        {{ $suspect->identity_number ?? '-' }}
+                    </td>
+
+                    <td>{{ $suspect->address }}</td>
+
+                    <td>{{ ucfirst($suspect->status) }}</td>
+
+                    <td>
+                        {{ $suspect->notes ?? '-' }}
+                    </td>
+
+                    <td>
+                        <a href="{{ route('suspect.show', $suspect->id) }}">
+                            Detail
+                        </a>
+
+                        |
+
+                        <a href="{{ route('suspect.edit', $suspect->id) }}">
+                            Edit
+                        </a>
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+@endif
+
+
+<hr>
+
+
+<h2>Tambah Suspect</h2>
+
+@if ($errors->any())
+    <ul>
+        @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+@endif
+
+<form
+    action="{{ route('suspect.store', $case->id) }}"
+    method="POST"
+>
+    @csrf
+
+    <div>
+        <label for="name">Name</label>
+
+        <input
+            type="text"
+            name="name"
+            id="name"
+            value="{{ old('name') }}"
+        >
+    </div>
+
+    <br>
+
+    <div>
+        <label for="identity_number">Identity Number</label>
+
+        <input
+            type="text"
+            name="identity_number"
+            id="identity_number"
+            value="{{ old('identity_number') }}"
+        >
+    </div>
+
+    <br>
+
+    <div>
+        <label for="address">Address</label>
+
+        <input
+            type="text"
+            name="address"
+            id="address"
+            value="{{ old('address') }}"
+        >
+    </div>
+
+    <br>
+
+    <div>
+        <label for="status">Status</label>
+
+        <select name="status" id="status">
+
+            <option
+                value="identified"
+                @selected(old('status') === 'identified')
+            >
+                Identified
+            </option>
+
+            <option
+                value="wanted"
+                @selected(old('status') === 'wanted')
+            >
+                Wanted
+            </option>
+
+            <option
+                value="detained"
+                @selected(old('status') === 'detained')
+            >
+                Detained
+            </option>
+
+            <option
+                value="released"
+                @selected(old('status') === 'released')
+            >
+                Released
+            </option>
+
+        </select>
+    </div>
+
+    <br>
+
+    <div>
+        <label for="notes">Notes</label>
+
+        <textarea
+            name="notes"
+            id="notes"
+        >{{ old('notes') }}</textarea>
+    </div>
+
+    <br>
+
+    <button type="submit">
+        Tambah Suspect
+    </button>
+</form>
+
     <hr>
 
 
-    <h2>Evidences</h2>
-    @forelse ($case->evidences as $evidence)
-        <p>{{ $evidence->name }}</p>
-    @empty
-        <p>Belum ada evidence.</p>
-    @endforelse
+<h2>Evidences</h2>
+
+@if ($case->evidences->isEmpty())
+
+    <p>Belum ada evidence.</p>
+
+@else
+
+    <table border="1" cellpadding="8">
+
+        <thead>
+            <tr>
+                <th>Evidence Code</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Storage Location</th>
+                <th>Status</th>
+                <th>Record Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @foreach ($case->evidences as $evidence)
+
+                <tr>
+
+                    <td>
+                        {{ $evidence->evidence_code }}
+                    </td>
+
+                    <td>
+                        {{ $evidence->name }}
+                    </td>
+
+                    <td>
+                        {{ $evidence->category->name ?? '-' }}
+                    </td>
+
+                    <td>
+                        {{ $evidence->storage_location }}
+                    </td>
+
+                    <td>
+                        {{ $evidence->status }}
+                    </td>
+
+                    <td>
+                        {{ $evidence->record_status }}
+                    </td>
+
+                    <td>
+
+                        <a href="{{ route('evidence.show', $evidence->id) }}">
+                            Detail
+                        </a>
+
+                        @if ($evidence->record_status === 'Valid')
+
+                            |
+
+                            <a href="{{ route('evidence.edit', $evidence->id) }}">
+                                Edit
+                            </a>
+
+                        @endif
+
+                    </td>
+
+                </tr>
+
+            @endforeach
+
+        </tbody>
+
+    </table>
+
+@endif
     
     <br>
     <hr>

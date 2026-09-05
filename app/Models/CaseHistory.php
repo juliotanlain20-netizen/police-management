@@ -13,10 +13,12 @@ use Illuminate\Database\Eloquent\Model;
 ])]
 class CaseHistory extends Model
 {
-    public function investigationCases(){
-        return $this->belongsTo(InvestigationCase::class);
+    public function investigationCases()
+    {
+        return $this->belongsTo(InvestigationCase::class, 'investigation_case_id');
     }
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 }

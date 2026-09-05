@@ -14,12 +14,12 @@ class PoliceController extends Controller
 {
     public function index()
     {
-        $police = PoliceOfficer::all();
+        $police = PoliceOfficer::with(['user','rank','unit'])->get();
         return view('police.index', compact('police'));
     }
     public function show($id)
     {
-        $police = PoliceOfficer::findOrFail($id);
+        $police = PoliceOfficer::with(['user','rank','unit'])->findOrFail($id);
         return view('police.show', compact('police'));
     }
     //dari sini semua tugas admin
@@ -47,11 +47,11 @@ class PoliceController extends Controller
                 'rank_id' => $data['rank_id'],
                 'unit_id' => $data['unit_id'],
                 'nrp' => $data['nrp'],
-                'address' => $data['address'],
+                'address' => $data['address'] ?? null,
                 'status' => 'Active',
             ]);
         });
-        return redirect()->route('police.index');
+        return redirect()->route('police.index')->with('success', 'Police Officer berhasil di buat');
     }
     public function update(PoliceRequest $request, $id)
     {
@@ -61,10 +61,10 @@ class PoliceController extends Controller
             'unit_id' => $data['unit_id'],
             'rank_id' => $data['rank_id'],
             'nrp' => $data['nrp'],
-            'address' => $data['address'],
+            'address' => $data['address'] ?? null,
             'status' => $data['status'],
         ]);
-        return redirect()->route('police.show', $police->id);
+        return redirect()->route('police.show', $police->id)->with('success', 'Police Officer berhasil di update');
     }
     public function edit($id)
     {

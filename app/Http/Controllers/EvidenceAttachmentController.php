@@ -16,7 +16,12 @@ class EvidenceAttachmentController extends Controller
         $request->validate([
             'attachment' => 'required|file|mimes:jpg,jpeg,png,pdf|max:10240',
         ]);
-        $evidence = Evidence::findOrFail($evidenceId);
+        $evidence = Evidence::with('investigationCase')->findOrFail($evidenceId);
+
+        $this->ensureAssignedToCase(
+            $request->user(),
+            $evidence->investigationCase
+        );
         $file = $request->file('attachment');
         if ($evidence->record_status !== 'Valid') {
             abort(409, 'Evidence yang sudah Voided tidak dapat diubah');
@@ -39,13 +44,16 @@ class EvidenceAttachmentController extends Controller
             ]);
         });
         return redirect()->route('evidence.edit', $evidence->id)
-            ->with('success', 'Attacchment berhasil ditambahkan');
+            ->with('success', 'Attachment berhasil ditambahkan');
     }
     public function show($evidenceId, $attachmentId)
     {
         $evidence = Evidence::findOrFail($evidenceId);
         $attachment = EvidenceAttachment::where('evidence_id', $evidence->id)
             ->findOrFail($attachmentId);
+        if (!Storage::exists($attachment->file_path)) {
+            abort(404, 'File attachment tidak ditemukan di storage');
+        }
         return Storage::response(
             $attachment->file_path,
             $attachment->file_name,
@@ -60,6 +68,9 @@ class EvidenceAttachmentController extends Controller
         $evidence = Evidence::findOrFail($evidenceId);
         $attachment = EvidenceAttachment::where('evidence_id', $evidence->id)
             ->findOrFail($attachmentId);
+        if (!Storage::exists($attachment->file_path)) {
+            abort(404, 'File attachment tidak ditemukan di storage');
+        }
         return Storage::download(
             $attachment->file_path,
             $attachment->file_name,
@@ -67,7 +78,12 @@ class EvidenceAttachmentController extends Controller
     }
     public function destroy(Request $request, $evidenceId, $attachmentId)
     {
-        $evidence = Evidence::findOrFail($evidenceId);
+        $evidence = Evidence::with('investigationCase')->findOrFail($evidenceId);
+
+        $this->ensureAssignedToCase(
+            $request->user(),
+            $evidence->investigationCase
+        );
         if ($evidence->record_status !== 'Valid') {
             abort(409, 'Evidence yang sudah Voided tidak dapat diubah');
         }
@@ -87,6 +103,6 @@ class EvidenceAttachmentController extends Controller
             ]);
         });
         return redirect()->route('evidence.edit', $evidence->id)
-            ->with('success', 'Attacchment berhasil dihapus');
+            ->with('success', 'Attachment berhasil dihapus');
     }
 }

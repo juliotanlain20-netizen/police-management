@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\InvestigationRequest;
 use App\Http\Requests\StoreInvestigationRequest;
+use App\Models\CaseHistory;
 use App\Models\Complaint;
 use App\Models\EvidenceCategory;
 use App\Models\InvestigationCase;
@@ -33,68 +34,120 @@ class InvestigationCaseController extends Controller
             'priority',
             'opened_at',
             'closed_at',
-        ])->with(['suspects', 'complaint.attachments', 'evidences', 'officers.user'])->firstOrFail();
+        ])->with(['suspects', 'complaint.attachments', 'evidences.category', 'officers.user', 'histories.user'])->firstOrFail();
         return view('cases.show', compact('case', 'police', 'evidenceCategories'));
         //'complaint.attachments' melalui complaint, ambil complaintattachment karna kan tersambung dengan complaint
         // itu with('berdasarkan nama method di belongsto di model')
     }
     public function store(StoreInvestigationRequest $request, $id)
     { //lock yang akan di urus
-        DB::transaction(function () use ($request, $id) {
+        $data = $request->validated();
+        DB::transaction(function () use ($request, $data, $id) {
             $complaint = Complaint::whereKey($id)->lockForUpdate()
-                ->findOrFail();
+                ->firstOrFail();
 
             if ($complaint->investigationCase()->exists()) {
-                return abort(409, 'complaint sudah menjadi case');
+                abort(409, 'complaint sudah menjadi case');
             }
             if ($complaint->status !== 'Pending') {
                 abort(403, 'Hanya complaint berstatus Pending yang dapat di jadikan kasus');
             }
 
-            InvestigationCase::create([
+            $case = InvestigationCase::create([
                 'complaint_id' => $complaint->id,
-                'case_number' => $request['case_number'],
+                'case_number' => $data['case_number'],
                 'title' => $complaint->title,
                 'description' => $complaint->description,
                 'status' => 'Open',
-                'priority' => $request['priority'],
+                'priority' => $data['priority'],
                 'opened_at' => now()
             ]);
             $complaint->update([
                 'status' => 'Approved'
             ]);
+            CaseHistory::create([
+                'investigation_case_id' => $case->id,
+                'user_id' => $request->user()->id,
+                'activity' => 'Case Created',
+                'notes' => 'Investigation case dibuat dari complaint.',
+            ]);
         });
-        return $this->index();
+        return redirect()->route('cases.index')->with('success', 'Berhasil menambah case');
     }
-    public function edit($id)
+    private function ensureAssignedOfficer($user, InvestigationCase $case)
     {
+        $officer = $user->officer;
+        $isAdmin = $user->roles()
+            ->where('roles.name', 'admin')
+            ->exists();
+        if ($isAdmin) {
+            return;
+        }
+
+        if (!$officer) {
+            abort(403, 'User bukan Police Officer');
+        }
+        if ($officer->status !== 'Active') {
+            abort(403, 'Police Officer sudah tidak aktif');
+        }
+
+        $assigned = $case->officers()
+            ->where('police_officers.id', $officer->id)
+            ->wherePivot('status', 'Active')
+            ->exists();
+
+        if (!$assigned) {
+            abort(403, 'Hanya officer yang ditugaskan pada case ini yang dapat mengubah case');
+        }
+    }
+    public function edit(Request $request, $id)
+    {
+
         $case = InvestigationCase::findOrFail($id);
+        $this->ensureAssignedOfficer(
+            $request->user(),
+            $case
+        );
         return view('cases.edit', ['case' => $case]);
     }
     public function update(InvestigationRequest $request, $id)
     {
-        // InvestigationCase::where('id',$id)->update([
-        //     'case_number'=>$request['case_number'],
-        //     'title'=>$request['title'],
-        //     'description'=>$request['description'],
-        //     'status'=>$request['status'],
-        //     'priority'=>$request['priority'],
-        //     'closed_at'=>$request['status'] === 'Closed' ? now() : null,
-        // ]);
-        //AGAR KALAU DI UPDATE SESUAI KEINGINAN SAJA
         $case = InvestigationCase::findOrFail($id);
         $data = $request->validated();
+        $this->ensureAssignedOfficer(
+            $request->user(),
+            $case
+        );
 
-        if (isset($data['status'])) {
-            if ($data['status'] === 'Closed' && $case->status !== 'Closed') {
-                $data['closed_at'] = now();
+        DB::transaction(function () use ($request, $case, $data) {
+
+            $oldStatus = $case->status;
+            $closedAt = $case->closed_at;
+            if ($data['status'] === 'Closed' && $oldStatus !== 'Closed') {
+                $closedAt = now();
             }
-
             if ($data['status'] !== 'Closed') {
-                $data['closed_at'] = null;
+                $closedAt = null;
             }
-        }
-        $case->update($data);
-        return $this->show($id);
+            $case->update([
+                'title' => $data['title'],
+                'description' => $data['description'],
+                'status' => $data['status'],
+                'priority' => $data['priority'],
+                'closed_at' => $closedAt,
+            ]);
+            if ($oldStatus !== $data['status']) {
+                CaseHistory::create([
+                    'investigation_case_id' => $case->id,
+                    'user_id' => $request->user()->id,
+                    'activity' => 'Case Status Changed',
+                    'notes' => $oldStatus . ' → ' . $data['status'],
+                ]);
+            }
+        });
+
+        return redirect()
+            ->route('cases.show', $case->id)
+            ->with('success', 'Investigation case berhasil diperbarui.');
     }
 }

@@ -10,6 +10,11 @@
 <body>
 
     <h1>Detail Police Officer</h1>
+        @if (session('success'))
+    <div>
+        {{ session('success') }}
+    </div>
+@endif
 
     <p>
         <strong>ID:</strong>

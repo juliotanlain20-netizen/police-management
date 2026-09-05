@@ -15,7 +15,7 @@
 @endif
     <form action="{{route('police.update',['id' => $police->id])}}" method="POST">
         @csrf
-        @method('PUT')
+        @method('PATCH')
         <p>Nama: {{ $police->user->name }}</p>
 <p>Email: {{ $police->user->email }}</p>
             <div>

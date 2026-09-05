@@ -21,7 +21,7 @@ class InvestigationCase extends Model
         return $this->belongsTo(Complaint::class);
     }
     public function histories(){
-        return $this->hasMany(CaseHistory::class);
+        return $this->hasMany(CaseHistory::class,'investigation_case_id');
     }
     public function evidences(){
         return $this->hasMany(Evidence::class,'investigation_case_id','id');

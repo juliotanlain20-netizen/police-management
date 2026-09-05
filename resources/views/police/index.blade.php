@@ -10,6 +10,11 @@
 <body>
 
     <h1>Daftar Police Officer</h1>
+        @if (session('success'))
+    <div>
+        {{ session('success') }}
+    </div>
+@endif
 
     @forelse ($police as $police)
         <div>
