@@ -33,8 +33,50 @@ class ComplaintController extends Controller
                 });
             }
         }
+        /*
+    |--------------------------------------------------------------------------
+    | SEARCH
+    |--------------------------------------------------------------------------
+    */
+
+        if ($request->filled('q')) {
+            $search = trim($request->q);
+
+            $query->where(function ($query) use ($search, $user) {
+                $query->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+
+                if ($user->hasPermission('complaint.view_all')) {
+                    $query->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', "%{$search}%");
+                    });
+                }
+            });
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | STATUS FILTER
+    |--------------------------------------------------------------------------
+    */
+
+        $allowedStatuses = [
+            'Draft',
+            'Pending',
+            'Need More Evidence',
+            'Approved',
+            'Rejected',
+        ];
+
+        if (
+            $request->filled('status') &&
+            in_array($request->status, $allowedStatuses, true)
+        ) {
+            $query->where('status', $request->status);
+        }
 
         $complaints = $query->get();
+
         return view('complaint.index', compact('complaints'));
     }
     public function show(Request $request, $id)

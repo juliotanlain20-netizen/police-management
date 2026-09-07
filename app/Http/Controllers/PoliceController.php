@@ -8,18 +8,44 @@ use App\Models\Rank;
 use App\Models\Role;
 use App\Models\Unit;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PoliceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $police = PoliceOfficer::with(['user','rank','unit'])->get();
+        $query = PoliceOfficer::with([
+            'user',
+            'rank',
+            'unit'
+        ]);
+
+        if ($request->filled('q')) {
+            $search = trim($request->q);
+
+            $query->where(function ($query) use ($search) {
+                $query->where('nrp', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('rank', function ($rankQuery) use ($search) {
+                        $rankQuery->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('unit', function ($unitQuery) use ($search) {
+                        $unitQuery->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $police = $query->get();
+
         return view('police.index', compact('police'));
     }
     public function show($id)
     {
-        $police = PoliceOfficer::with(['user','rank','unit'])->findOrFail($id);
+        $police = PoliceOfficer::with(['user', 'rank', 'unit'])->findOrFail($id);
         return view('police.show', compact('police'));
     }
     //dari sini semua tugas admin

@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CaseOfficerController;
+use App\Http\Controllers\CaseSummaryController;
 use App\Http\Controllers\ComplaintAttachmentController;
 use App\Http\Controllers\ComplaintController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EvidenceAttachmentController;
 use App\Http\Controllers\EvidenceController;
 use App\Http\Controllers\InvestigationCaseController;
@@ -34,7 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/complaint/{complaintId}/attachments/{attachmentId}/download', [ComplaintAttachmentController::class, 'download'])->name('complaint.attachments.download');
     Route::delete('/complaint/{complaintId}/attachments/{attachmentId}', [ComplaintAttachmentController::class, 'destroy'])->name('complaint.attachments.destroy');
     //INVESTIGATION CASES
-    Route::post('/complaint/{id}/case', [InvestigationCaseController::class, 'store'])->middleware(['permission:case.create','active.police'])->name('cases.store');
+    Route::post('/complaint/{id}/case', [InvestigationCaseController::class, 'store'])->middleware(['permission:case.create', 'active.police'])->name('cases.store');
     Route::get('/cases', [InvestigationCaseController::class, 'index'])->middleware('permission:case.view_all')->name('cases.index');
     Route::get('/case/{id}', [InvestigationCaseController::class, 'show'])->middleware('permission:case.view_all')->name('cases.show');
     Route::patch('/case/{id}', [InvestigationCaseController::class, 'update'])->middleware(['permission:case.update', 'active.police'])->name('cases.update');
@@ -59,11 +61,15 @@ Route::middleware('auth')->group(function () {
     Route::delete('evidence/{evidenceId}/attachment/{attachmentId}', [EvidenceAttachmentController::class, 'destroy'])->middleware(['permission:evidence.manage_attachment', 'active.police'])->name('evidence.attachment.destroy');
     //suspect
     Route::get('suspect/{id}', [SuspectController::class, 'show'])->middleware('permission:suspect.view')->name('suspect.show');
-    Route::post('case/{caseId}/suspect', [SuspectController::class, 'store'])->middleware(['permission:suspect.create','active.police'])->name('suspect.store');
+    Route::post('case/{caseId}/suspect', [SuspectController::class, 'store'])->middleware(['permission:suspect.create', 'active.police'])->name('suspect.store');
     Route::patch('suspect/{id}', [SuspectController::class, 'update'])->middleware(['permission:suspect.update', 'active.police'])->name('suspect.update');
     Route::get('suspect/{id}/edit', [SuspectController::class, 'edit'])->middleware(['permission:suspect.update', 'active.police'])->name('suspect.edit');
     //logout
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/case/{id}/summary/pdf', [CaseSummaryController::class, 'download'])->middleware('permission:case.view_all')
+        ->name('cases.summary.pdf');
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
 });
 //khusus admin
 Route::middleware(['auth', 'admin'])->group(function () {

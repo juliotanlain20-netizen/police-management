@@ -14,11 +14,50 @@ use Illuminate\Support\Facades\DB;
 
 class InvestigationCaseController extends Controller
 {
-    public function index()
-    {
-        $cases = InvestigationCase::all();
-        return view('cases.index', compact('cases'));
+    public function index(Request $request)
+{
+    $query = InvestigationCase::query()->latest('opened_at');
+
+    if ($request->filled('q')) {
+        $search = trim($request->q);
+
+        $query->where(function ($query) use ($search) {
+            $query->where('case_number', 'like', "%{$search}%")
+                ->orWhere('title', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%");
+        });
     }
+
+    $allowedStatuses = [
+        'Open',
+        'In Progress',
+        'Closed',
+    ];
+
+    if (
+        $request->filled('status') &&
+        in_array($request->status, $allowedStatuses, true)
+    ) {
+        $query->where('status', $request->status);
+    }
+
+    $allowedPriorities = [
+        'Low',
+        'Medium',
+        'High',
+    ];
+
+    if (
+        $request->filled('priority') &&
+        in_array($request->priority, $allowedPriorities, true)
+    ) {
+        $query->where('priority', $request->priority);
+    }
+
+    $cases = $query->get();
+
+    return view('cases.index', compact('cases'));
+}
     public function show($id)
     {
         $police = PoliceOfficer::where('status', 'Active')->with('user')->get();

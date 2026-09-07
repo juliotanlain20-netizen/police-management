@@ -7,3 +7,1241 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/* =========================================================
+   TRAKSA AUTH COMPONENTS
+========================================================= */
+
+@layer components {
+
+    /* =====================================================
+       PAGE
+    ====================================================== */
+
+    .traksa-auth-page {
+        min-height: 100vh;
+        margin: 0;
+
+        background: #ffffff;
+        color: #0f172a;
+    }
+
+
+    .traksa-auth-shell {
+        display: grid;
+        grid-template-columns:
+            minmax(430px, 46%) 1fr;
+
+        min-height: 100vh;
+    }
+
+
+    /* =====================================================
+       LEFT BRAND PANEL
+    ====================================================== */
+
+    .traksa-auth-brand {
+        position: relative;
+
+        display: flex;
+
+        min-height: 100vh;
+
+        padding:
+            58px 68px;
+
+        overflow: hidden;
+
+        background:
+            linear-gradient(145deg,
+                #07162b 0%,
+                #0B1F3A 55%,
+                #12396b 100%);
+
+        color: #ffffff;
+    }
+
+
+    .traksa-auth-brand::before {
+        content: "";
+
+        position: absolute;
+
+        width: 620px;
+        height: 620px;
+
+        top: -270px;
+        right: -180px;
+
+        border:
+            100px solid rgba(47, 128, 237, .075);
+
+        border-radius: 50%;
+
+        pointer-events: none;
+    }
+
+
+    .traksa-auth-brand::after {
+        content: "";
+
+        position: absolute;
+
+        width: 650px;
+        height: 650px;
+
+        bottom: -360px;
+        left: -330px;
+
+        border:
+            90px solid rgba(47, 128, 237, .07);
+
+        border-radius: 50%;
+
+        pointer-events: none;
+    }
+
+
+    .traksa-auth-brand-content {
+        position: relative;
+        z-index: 1;
+
+        display: flex;
+        flex-direction: column;
+
+        width: 100%;
+    }
+
+
+    .traksa-auth-brand-message {
+        width: 100%;
+        max-width: 620px;
+
+        margin:
+            auto 0;
+    }
+
+
+    .traksa-auth-brand-eyebrow {
+        display: inline-block;
+
+        margin-bottom: 24px;
+
+        color: #93c5fd;
+
+        font-size: 13px;
+        font-weight: 800;
+
+        text-transform: uppercase;
+        letter-spacing: .14em;
+    }
+
+
+    .traksa-auth-brand-title {
+        margin:
+            0 0 28px;
+
+        color: #ffffff;
+
+        font-size:
+            clamp(2.5rem, 4.2vw, 4.5rem);
+
+        font-weight: 750;
+
+        line-height: 1.08;
+        letter-spacing: -.045em;
+    }
+
+
+    .traksa-auth-brand-title span {
+        color: #4f9cff;
+    }
+
+
+    .traksa-auth-brand-description {
+        max-width: 600px;
+
+        margin: 0;
+
+        color: #dbeafe;
+
+        font-size: 15px;
+
+        line-height: 1.8;
+    }
+
+
+    .traksa-auth-brand-footer {
+        margin-top: auto;
+
+        padding-top: 40px;
+
+        color: #7892b2;
+
+        font-size: 12px;
+    }
+
+
+    /* =====================================================
+       RIGHT AUTH PANEL
+    ====================================================== */
+
+    .traksa-auth-main {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        min-width: 0;
+        min-height: 100vh;
+
+        padding:
+            55px 80px;
+
+        background: #ffffff;
+    }
+
+
+    .traksa-auth-container {
+        width: 100%;
+        max-width: 530px;
+    }
+
+
+    /* =====================================================
+       LOGO
+    ====================================================== */
+
+    .traksa-auth-logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 100%;
+
+        margin-bottom: 34px;
+    }
+
+
+    .traksa-auth-logo img {
+        display: block;
+
+        width: 112px;
+        height: auto;
+
+        object-fit: contain;
+    }
+
+
+    /* =====================================================
+       HEADER
+    ====================================================== */
+
+    .traksa-auth-header {
+        margin-bottom: 32px;
+    }
+
+
+    .traksa-auth-eyebrow {
+        display: block;
+
+        margin-bottom: 10px;
+
+        color: #2F80ED;
+
+        font-size: 12px;
+        font-weight: 800;
+
+        text-transform: uppercase;
+        letter-spacing: .11em;
+    }
+
+
+    .traksa-auth-title {
+        margin:
+            0 0 10px;
+
+        color: #0B1F3A;
+
+        font-size: 32px;
+        font-weight: 750;
+
+        line-height: 1.25;
+        letter-spacing: -.025em;
+    }
+
+
+    .traksa-auth-description {
+        margin: 0;
+
+        color: #64748b;
+
+        font-size: 14px;
+
+        line-height: 1.7;
+    }
+
+
+    /* =====================================================
+       FORM
+    ====================================================== */
+
+    .traksa-auth-form {
+        display: flex;
+        flex-direction: column;
+
+        gap: 19px;
+    }
+
+
+    .traksa-auth-field {
+        display: flex;
+        flex-direction: column;
+
+        gap: 8px;
+    }
+
+
+    .traksa-auth-label {
+        color: #334155;
+
+        font-size: 13px;
+        font-weight: 650;
+    }
+
+
+    /* =====================================================
+       INPUT WRAPPER
+    ====================================================== */
+
+    .traksa-auth-input-wrapper {
+        position: relative;
+
+        width: 100%;
+    }
+
+
+    /*
+     * Icon kiri.
+     *
+     * Secara visual berada DI DALAM input.
+     */
+    .traksa-auth-input-icon {
+        position: absolute;
+
+        top: 50%;
+        left: 16px;
+
+        z-index: 2;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 18px;
+        height: 18px;
+
+        transform:
+            translateY(-50%);
+
+        color: #94a3b8;
+
+        pointer-events: none;
+    }
+
+
+    .traksa-auth-input-icon svg {
+        display: block;
+
+        width: 18px;
+        height: 18px;
+    }
+
+
+    /* =====================================================
+       INPUT
+    ====================================================== */
+
+    .traksa-auth-input {
+        display: block;
+
+        width: 100%;
+        height: 52px;
+
+        /*
+         * 46px kiri memberikan ruang
+         * untuk icon di dalam input.
+         */
+        padding:
+            0 16px 0 46px;
+
+        background: #ffffff;
+
+        border:
+            1px solid #cbd5e1;
+
+        border-radius: 10px;
+
+        outline: none;
+
+        color: #0f172a;
+
+        font-family: inherit;
+        font-size: 14px;
+
+        transition:
+            border-color .15s ease,
+            box-shadow .15s ease,
+            background .15s ease;
+    }
+
+
+    .traksa-auth-input::placeholder {
+        color: #94a3b8;
+    }
+
+
+    .traksa-auth-input:hover {
+        border-color: #b8c6d9;
+    }
+
+
+    .traksa-auth-input:focus {
+        border-color: #2F80ED;
+
+        box-shadow:
+            0 0 0 4px rgba(47, 128, 237, .10);
+    }
+
+
+    /*
+     * Password butuh ruang tambahan
+     * untuk tombol eye di kanan.
+     */
+    .traksa-auth-input-password {
+        padding-right: 54px;
+    }
+
+
+    /* =====================================================
+       PASSWORD EYE
+    ====================================================== */
+
+    .traksa-auth-password-toggle {
+        position: absolute;
+
+        top: 50%;
+        right: 10px;
+
+        z-index: 3;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 34px;
+        height: 34px;
+
+        padding: 0;
+
+        transform:
+            translateY(-50%);
+
+        background: transparent;
+
+        border: 0;
+        border-radius: 7px;
+
+        color: #64748b;
+
+        cursor: pointer;
+
+        transition:
+            background .15s ease,
+            color .15s ease;
+    }
+
+
+    .traksa-auth-password-toggle:hover {
+        background: #eff6ff;
+
+        color: #2F80ED;
+    }
+
+
+    .traksa-auth-password-toggle:focus {
+        outline: none;
+
+        box-shadow:
+            0 0 0 3px rgba(47, 128, 237, .12);
+    }
+
+
+    .traksa-auth-password-toggle svg {
+        display: block;
+
+        width: 18px;
+        height: 18px;
+    }
+
+
+    /* =====================================================
+       BUTTON
+    ====================================================== */
+
+    .traksa-auth-submit {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 100%;
+        height: 50px;
+
+        margin-top: 3px;
+
+        padding:
+            0 20px;
+
+        background: #0B1F3A;
+
+        border: 0;
+        border-radius: 10px;
+
+        color: #ffffff;
+
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 700;
+
+        cursor: pointer;
+
+        box-shadow:
+            0 2px 5px rgba(15, 23, 42, .08);
+
+        transition:
+            background .15s ease,
+            transform .1s ease,
+            box-shadow .15s ease;
+    }
+
+
+    .traksa-auth-submit:hover {
+        background: #12396b;
+
+        box-shadow:
+            0 5px 12px rgba(15, 23, 42, .12);
+    }
+
+
+    .traksa-auth-submit:active {
+        transform:
+            scale(.995);
+    }
+
+
+    .traksa-auth-submit:focus {
+        outline: none;
+
+        box-shadow:
+            0 0 0 4px rgba(47, 128, 237, .14);
+    }
+
+
+    /* =====================================================
+       ALERT
+    ====================================================== */
+
+    .traksa-auth-alert {
+        display: flex;
+        align-items: flex-start;
+
+        gap: 11px;
+
+        margin-bottom: 25px;
+
+        padding:
+            14px 15px;
+
+        border-radius: 10px;
+
+        font-size: 13px;
+
+        line-height: 1.6;
+    }
+
+
+    .traksa-auth-alert-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 24px;
+        height: 24px;
+
+        flex-shrink: 0;
+
+        border-radius: 50%;
+
+        color: #ffffff;
+    }
+
+
+    .traksa-auth-alert-icon svg {
+        width: 14px;
+        height: 14px;
+    }
+
+
+    .traksa-auth-alert-success {
+        background: #f0fdf4;
+
+        border:
+            1px solid #bbf7d0;
+
+        color: #166534;
+    }
+
+
+    .traksa-auth-alert-success .traksa-auth-alert-icon {
+        background: #16a34a;
+    }
+
+
+    .traksa-auth-alert-error {
+        background: #fff1f2;
+
+        border:
+            1px solid #fecdd3;
+
+        color: #9f1239;
+    }
+
+
+    .traksa-auth-alert-error .traksa-auth-alert-icon {
+        background: #e11d48;
+    }
+
+
+    .traksa-auth-alert strong {
+        font-weight: 700;
+    }
+
+
+    .traksa-auth-alert ul {
+        margin:
+            6px 0 0;
+
+        padding-left: 17px;
+    }
+
+
+    /* =====================================================
+       SECURITY NOTE
+    ====================================================== */
+
+    .traksa-auth-security {
+        display: flex;
+        align-items: flex-start;
+
+        gap: 9px;
+
+        margin-top: 28px;
+
+        padding-top: 23px;
+
+        border-top:
+            1px solid #e2e8f0;
+
+        color: #94a3b8;
+
+        font-size: 11px;
+
+        line-height: 1.6;
+    }
+
+
+    .traksa-auth-security-icon {
+        width: 18px;
+        height: 18px;
+
+        flex-shrink: 0;
+
+        color: #2F80ED;
+    }
+
+
+    /* =====================================================
+       TABLET
+    ====================================================== */
+
+    @media (max-width: 1050px) {
+
+        .traksa-auth-shell {
+            grid-template-columns:
+                minmax(350px, 42%) 1fr;
+        }
+
+
+        .traksa-auth-brand {
+            padding:
+                45px;
+        }
+
+
+        .traksa-auth-main {
+            padding:
+                40px 24px;
+        }
+
+
+        .traksa-auth-container {
+            max-width: 500px;
+        }
+
+
+        .traksa-auth-logo img {
+            width: 100px;
+        }
+
+
+        .traksa-auth-title {
+            font-size: 27px;
+        }
+
+    }
+
+
+    /* =====================================================
+       MOBILE
+    ====================================================== */
+
+    @media (max-width: 760px) {
+
+        .traksa-auth-shell {
+            display: block;
+
+            min-height: 100vh;
+        }
+
+
+        .traksa-auth-brand {
+            display: none;
+        }
+
+
+        .traksa-auth-main {
+            min-height: 100vh;
+
+            padding:
+                28px 20px 36px;
+        }
+
+
+        .traksa-auth-container {
+            max-width: 500px;
+        }
+
+
+        .traksa-auth-logo {
+            margin-bottom: 30px;
+        }
+
+
+        .traksa-auth-logo img {
+            width: 92px;
+        }
+
+
+        .traksa-auth-title {
+            font-size: 24px;
+        }
+
+
+        .traksa-auth-security {
+            margin-bottom: 20px;
+        }
+
+    }
+
+
+    /* =====================================================
+       VERY SMALL MOBILE
+    ====================================================== */
+
+    @media (max-width: 420px) {
+
+        .traksa-auth-main {
+            padding-left: 16px;
+            padding-right: 16px;
+        }
+
+
+        .traksa-auth-logo img {
+            width: 88px;
+        }
+
+
+        .traksa-auth-input {
+            height: 50px;
+        }
+
+
+        .traksa-auth-submit {
+            height: 50px;
+        }
+
+    }
+
+    /* =========================================================
+   REGISTER VARIANT
+========================================================= */
+
+    .traksa-auth-main-register {
+        padding-top: 38px;
+        padding-bottom: 38px;
+    }
+
+    .traksa-auth-main-register .traksa-auth-logo {
+        margin-bottom: 22px;
+    }
+
+    .traksa-auth-main-register .traksa-auth-header {
+        margin-bottom: 24px;
+    }
+
+    .traksa-auth-main-register .traksa-auth-form {
+        gap: 14px;
+    }
+
+    .traksa-auth-main-register .traksa-auth-input {
+        height: 48px;
+    }
+
+    .traksa-auth-main-register .traksa-auth-submit {
+        height: 48px;
+    }
+
+    .traksa-auth-main-register .traksa-auth-security {
+        margin-top: 22px;
+        padding-top: 18px;
+    }
+
+    @media (max-width: 760px) {
+
+        .traksa-auth-main-register {
+            padding-top: 28px;
+            padding-bottom: 32px;
+        }
+
+    }
+
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background: #E9EEF5;
+    color: #1f2937;
+}
+
+
+/* =========================
+   APP
+========================= */
+
+.app-shell {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.app-main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.content {
+    flex: 1;
+
+    padding: 30px;
+}
+
+
+
+
+/* =========================
+   PAGE HEADER
+========================= */
+
+.page-header {
+    margin-bottom: 28px;
+}
+
+.page-header h1 {
+    margin: 0 0 6px;
+    font-size: 28px;
+    color: #0B1F3A;
+}
+
+.page-header p {
+    margin: 0;
+    color: #6b7280;
+}
+
+
+/* =========================
+   SECTION
+========================= */
+.section-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 24px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.section-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #0B1F3A;
+}
+
+
+/* =========================
+   TABLE
+========================= */
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+    padding: 13px 14px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.data-table th {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #6b7280;
+    background: #f9fafb;
+}
+
+.data-table td {
+    font-size: 14px;
+}
+
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* =========================
+   BUTTON
+========================= */
+
+.btn {
+    display: inline-block;
+    padding: 9px 14px;
+    border-radius: 7px;
+    text-decoration: none;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: #2F80ED;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #256ac3;
+}
+
+.btn-outline {
+    border: 1px solid #d1d5db;
+    color: #374151;
+    background: white;
+}
+
+
+/* =========================
+   STATUS BADGE
+========================= */
+
+.badge {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-approved {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge-rejected {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-evidence {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+.badge-draft {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.alert {
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+.alert-success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.alert-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+/* =========================
+   DETAIL PAGE
+========================= */
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.detail-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.detail-description {
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.detail-description p {
+    margin-bottom: 0;
+    line-height: 1.7;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+
+    padding: 10px 12px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+
+    font: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+
+    border-color: #2F80ED;
+}
+
+
+/* =========================
+   ACTIONS
+========================= */
+
+.action-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.action-group form {
+    margin: 0;
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+.empty-text {
+    color: #6b7280;
+}
+
+
+
+.form-help {
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.inline-form {
+    max-width: 550px;
+}
+/* =========================================================
+   TABLE ACTIONS
+========================================================= */
+
+.table-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.table-actions form {
+    margin: 0;
+}
+
+/* =========================================================
+   FORM GRID
+========================================================= */
+
+.form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 16px;
+}
+
+.form-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin-top: 18px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+/* =========================================================
+   EVIDENCE
+========================================================= */
+
+.section-description {
+    margin: 5px 0 0;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+/* Empty Table */
+.empty-state {
+    padding: 30px 15px;
+    text-align: center;
+}
+
+.empty-state strong {
+    display: block;
+    margin-bottom: 6px;
+    color: #374151;
+}
+
+.empty-state p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+/* =========================================================
+   EVIDENCE SHOW
+========================================================= */
+.section-card form {
+    max-width: 900px;
+}
+
