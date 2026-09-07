@@ -416,34 +416,23 @@ Rejected     Need More Evidence
 ```
 
 ---
-
 ## Screenshots
 
 ### Authentication
 
-Add a screenshot of the TRAKSA Login or Register page here.
-
-```markdown
 ![TRAKSA Login](docs/screenshots/login.png)
-```
 
 ### Administrator Dashboard
 
-```markdown
-![Admin Dashboard](docs/screenshots/admin-dashboard.png)
-```
+![TRAKSA Admin Dashboard](docs/screenshots/admin-dashboard.png)
 
 ### Investigation Case
 
-```markdown
-![Investigation Case](docs/screenshots/case-detail.png)
-```
+![TRAKSA Case Detail](docs/screenshots/case-detail.png)
 
 ### Evidence Management
 
-```markdown
-![Evidence Management](docs/screenshots/evidence-detail.png)
-```
+![TRAKSA Evidence Detail](docs/screenshots/evidence-detail.png)
 
 > Create a `docs/screenshots` directory and place the screenshots there before enabling the image links above.
 
